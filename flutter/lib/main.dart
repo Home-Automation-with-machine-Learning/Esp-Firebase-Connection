@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/screens/dashboard.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/signup.dart';
@@ -12,7 +13,7 @@ class TC extends StatelessWidget {
       initialRoute: '/login',
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => HomePage(),
+        '/': (context) => Dashboard(),
         '/login': (context) => LoginPage(),
         '/signup' :(context) => SignupPage(),
       },
