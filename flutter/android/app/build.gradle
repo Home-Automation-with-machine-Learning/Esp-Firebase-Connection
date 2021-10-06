@@ -25,6 +25,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.android.application'
+
+
 
 android {
     compileSdkVersion 30
@@ -49,6 +52,8 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        systemProp.http.auth.ntlm.domain=domain
     }
 
     buildTypes {
@@ -66,5 +71,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    classpath 'com.google.gms:google-services:4.3.8'
+
 }
