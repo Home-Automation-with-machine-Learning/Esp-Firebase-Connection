@@ -11,7 +11,7 @@
 
 // Initialize Wifi connection to the router
 char ssid[] = "press";     // your network SSID (name)
-char password[] = "11597200"; // your network key
+char password[] = "passw0rd"; // your network key
 
 // Initialize Telegram BOT
 #define BOTtoken "1985276546:AAHO4y_IrsKZg31q0K1ziFKIuQBhxi2AGxw" // your Bot Token (Get from Botfather)
@@ -27,6 +27,7 @@ unsigned long lastTimeBotRan;
 #define DHTTYPE    DHT11
 DHT dht(DHTPIN, DHTTYPE);
 const int ledPin = 5;
+int led = 4;
 int ledStatus = 0;
 
 //Define FirebaseESP8266 data object

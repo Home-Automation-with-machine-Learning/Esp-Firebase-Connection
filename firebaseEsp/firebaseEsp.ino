@@ -8,10 +8,12 @@
 #define FIREBASE_HOST "homeautomation-7c6bf-default-rtdb.firebaseio.com"                          // the project name address from firebase id
 #define FIREBASE_AUTH "5nJ61Vj1joGhvf8XQqkBpdHZ2JpsPGYQlEPrmN1Y"            // the secret key generated from firebase
 #define WIFI_SSID "press"
-#define WIFI_PASSWORD "11597200"
+#define WIFI_PASSWORD "passw0rd"
 
-#define DHTPIN D3   // Connect Data pin of DHT to D2
-int led =D5;      // Connect LED to D5
+#define DHTPIN D1   // Connect Data pin of DHT to D1
+int led =D5;
+int led1=D3;
+int led2=D4;// Connect LED to D5
 
 #define DHTTYPE    DHT11
 DHT dht(DHTPIN, DHTTYPE);
@@ -30,6 +32,8 @@ void setup()
 
   dht.begin();
   pinMode(led,OUTPUT);
+  pinMode(led1,OUTPUT);
+  pinMode(led2,OUTPUT);
   
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
@@ -40,6 +44,8 @@ void setup()
   }
   Serial.println();
   Serial.print("Connected with IP: ");
+  
+ 
   Serial.println(WiFi.localIP());
   Serial.println();
 
@@ -59,6 +65,11 @@ void sensorUpdate(){
   // Check if any reads failed 
   if (isnan(h) || isnan(t) || isnan(f)) {
     Serial.println(F("Failed to read from DHT sensor!"));
+    digitalWrite(led2, HIGH);
+     delay(1000);
+    digitalWrite(led2, LOW);
+     delay(1000);
+   
     return;
   }
 
@@ -74,6 +85,7 @@ void sensorUpdate(){
   {
      //Firebase.pushFloat(firebaseData,"/Temperature", t); //setup path and send readings
     Serial.println("PASSED");
+   
     
   }
   else
@@ -108,6 +120,15 @@ void loop() {
     digitalWrite(led, LOW);
     }
   }
-  delay(10000);
+  if (Firebase.getString(ledData, "/LED_STATUS1")){
+    Serial.println(ledData.stringData());
+    if (ledData.stringData() == "1") {
+    digitalWrite(led1, HIGH);
+    }
+  else if (ledData.stringData() == "0"){
+    digitalWrite(led1, LOW);
+    }
+  }
+  delay(1000);
 }
 //smartHomeAutomationwithMachineLearning 
