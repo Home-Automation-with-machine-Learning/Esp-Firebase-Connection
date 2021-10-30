@@ -18,12 +18,22 @@ unsigned long lastTimeBotRan;
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
-#define DHTPIN D3   // Connect Data pin of DHT to D1
+#define DHTPIN D2   // Connect Data pin of DHT to D1
 #define FAN_PIN D1   // FAN RELAY
-int led =D2;
-int ledStatus = 0;
-int led1=D5;
+int led =D7;//whiteBulb
+int rgb =D6;
+int lights =D3;
+int led1=D5; //greenBulb
 int led2=D4;//dht record led Connect LED to D5
+
+
+int D1Status = 0;
+int D2Status = 0;
+int D3Status = 0;
+int D4Status = 0;
+
+
+
 
 #define DHTTYPE    DHT11
 DHT dht(DHTPIN, DHTTYPE);
@@ -44,32 +54,66 @@ void handleNewMessages(int numNewMessages) {
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
 
-    if (text == "/ledon") {
+    if (text == "/Green_bulb_ON") {
       digitalWrite(led1, HIGH);   // turn the LED on (HIGH is the voltage level)
-      ledStatus = 1;
-       bot.sendMessage(chat_id, "Led is ON", "");
+       D1Status = 1;
+       bot.sendMessage(chat_id, "Hello the Green bulb is ON", "");
     }
 
-    if (text == "/ledoff") {
-      ledStatus = 0;
+    if (text == "/Green_bulb_OFF") {
+       D1Status = 0;
       digitalWrite(led1, LOW);    // turn the LED off (LOW is the voltage level)
-      bot.sendMessage(chat_id, "Led is OFF", "");
+      bot.sendMessage(chat_id, "OK the Green bulb turned OFF", "");
+    }
+    if (text == "/White_bulb_ON") {
+      digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
+       D2Status = 1;
+       bot.sendMessage(chat_id, "Hello the Green bulb is ON", "");
     }
 
-    if (text == "/status") {
-      if(ledStatus){
-        bot.sendMessage(chat_id, "Led is ON", "");
-      } else {
-        bot.sendMessage(chat_id, "Led is OFF", "");
-      }
+    if (text == "/White_bulb_OFF") {
+       D2Status = 0;
+      digitalWrite(led, LOW);    // turn the LED off (LOW is the voltage level)
+      bot.sendMessage(chat_id, "OK the Green bulb turned OFF", "");
     }
+     if (text == "/RGB_ON") {
+      digitalWrite(rgb,HIGH);
+      D3Status = 1;
+      bot.sendMessage(chat_id, "rgb is HIGH", "");
+    }
+
+    if (text == "/RGB_OFF") {
+      D3Status = 0;
+      digitalWrite(rgb, LOW);
+      bot.sendMessage(chat_id, "rgb is LOW", "");
+    }
+
+    if (text == "/Exrta_LIGHTs_ON") {
+      digitalWrite(lights,HIGH);
+      D4Status = 1;
+      bot.sendMessage(chat_id, "extra light is HIGH", "");
+    }
+
+    if (text == "/Extra_Lights_OFF") {
+      D4Status = 0;
+      digitalWrite(lights, LOW);
+      bot.sendMessage(chat_id, "extra light is LOW", "");
+    }
+
+   
+   
 
     if (text == "/start") {
-      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Flash Led Bot example.\n\n";
-      welcome += "/ledon : to switch the Led ON\n";
-      welcome += "/ledoff : to switch the Led OFF\n";
-      welcome += "/status : Returns current status of LED\n";
+      String welcome = "Welcome To Smart Home Automation Bot.Lets control your appliances from here, " + from_name + ".\n";
+      welcome += "Lets tap on this commands to change the statuses of your home.\n\n";
+      welcome += "/Green_bulb_ON : to Turn on the GreenBulb \n";
+      welcome += "/Green_bulb_OFF : to Turn off the GreenBulb \n";
+      welcome += "/White_bulb_ON : to Turn ON The White Bulb\n";
+      welcome += "/White_bulb_OFF : to Turn OFF The White Bulb\n";
+      welcome += "/RGB_ON : to Turn ON  RGB \n";
+      welcome += "/RGB_OFF : to Turn OFF RGB \n";
+      welcome += "/Exrta_LIGHTs_ON : to Turn ON The Extra Lighting system \n";
+      welcome += "/Exrta_LIGHTs_OFF : to Turn OFF The Extra Lighting system \n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
@@ -179,22 +223,22 @@ void loop() {
     
   } 
   
-  if (Firebase.getString(ledData, "/LED_STATUS")){
+  if (Firebase.getString(ledData, "/BEDROOM")){
     Serial.println(ledData.stringData());
-    if (ledData.stringData() == "1") {
-    digitalWrite(led, HIGH);
-    }
-  else if (ledData.stringData() == "0"){
-    digitalWrite(led, LOW);
-    }
-  }
-  if (Firebase.getString(ledData, "/LED_STATUS1")){
-    Serial.println(ledData.stringData());
-    if (ledData.stringData() == "1") {
+    if (ledData.stringData() == "true") {
     digitalWrite(led1, HIGH);
     }
-  else if (ledData.stringData() == "0"){
+  else if (ledData.stringData() == "false"){
     digitalWrite(led1, LOW);
+    }
+  }
+  if (Firebase.getString(ledData, "/DINNINGROOM")){
+    Serial.println(ledData.stringData());
+    if (ledData.stringData() == "true") {
+    digitalWrite(led, HIGH);
+    }
+  else if (ledData.stringData() == "false"){
+    digitalWrite(led, LOW);
     }
   }
   delay(1000);
