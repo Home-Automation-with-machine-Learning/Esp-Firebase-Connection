@@ -8,11 +8,12 @@
 #define FIREBASE_HOST "homeautomation-7c6bf-default-rtdb.firebaseio.com"                          // the project name address from firebase id
 #define FIREBASE_AUTH "5nJ61Vj1joGhvf8XQqkBpdHZ2JpsPGYQlEPrmN1Y"            // the secret key generated from firebase
 #define WIFI_SSID "press"
-#define WIFI_PASSWORD "passw0rd"
+#define WIFI_PASSWORD "Passw0rd"
 
-#define DHTPIN D1   // Connect Data pin of DHT to D1
-int led =D5;
-int led1=D3;
+#define DHTPIN D3   // Connect Data pin of DHT to D1
+#define FAN_PIN D1   // FAN RELAY
+int led =D2;
+int led1=D5;
 int led2=D4;// Connect LED to D5
 
 #define DHTTYPE    DHT11
@@ -31,6 +32,8 @@ void setup()
   Serial.begin(9600);//tells Esp8266 to get ready to exchange messages with the Serial Monitor at a data rate of 9600 bits per second
 
   dht.begin();
+  pinMode(FAN_PIN, OUTPUT);
+  digitalWrite(FAN_PIN, LOW);
   pinMode(led,OUTPUT);
   pinMode(led1,OUTPUT);
   pinMode(led2,OUTPUT);
@@ -65,10 +68,7 @@ void sensorUpdate(){
   // Check if any reads failed 
   if (isnan(h) || isnan(t) || isnan(f)) {
     Serial.println(F("Failed to read from DHT sensor!"));
-    digitalWrite(led2, HIGH);
-     delay(1000);
-    digitalWrite(led2, LOW);
-     delay(1000);
+    
    
     return;
   }
@@ -80,6 +80,10 @@ void sensorUpdate(){
   Serial.print(F("C  ,"));
   Serial.print(f);
   Serial.println(F("F  "));
+  digitalWrite(led2, HIGH);
+     delay(1000);
+  digitalWrite(led2, LOW);
+     delay(1000);
 
   if (Firebase.pushFloat(firebaseData, "/Humidity/TEMP", t))
   {
@@ -110,6 +114,18 @@ void sensorUpdate(){
 }
 void loop() {
   sensorUpdate();
+  float temp = dht.readTemperature();
+ 
+   if (temp > 25)
+  {
+    digitalWrite(FAN_PIN, HIGH);
+    Serial.println("FAN turned ON");
+}
+  else {
+    digitalWrite(FAN_PIN, LOW);
+    Serial.println("FAN turned OFF");
+    
+  } 
   
   if (Firebase.getString(ledData, "/LED_STATUS")){
     Serial.println(ledData.stringData());
