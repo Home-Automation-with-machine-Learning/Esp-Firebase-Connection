@@ -18,16 +18,18 @@ unsigned long lastTimeBotRan;
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
-#define DHTPIN D2   // Connect Data pin of DHT to D1
-#define FAN_PIN D1   // FAN RELAY
-int led =D7;//whiteBulb
-int rgb =D6;
+#define DHTPIN D1   // Connect Data pin of DHT to D1
+#define FAN_PIN D2   // FAN RELAY
+int AC=D0;
 int lights =D3;
-int led1=D5; //greenBulb
 int led2=D4;//dht record led Connect LED to D5
+int rgb =D5;
+int led1=D6; //greenBulb
+int led =D7;//whiteBulb
+int buzzer=D8;
 
 
-int D1Status = 0;
+
 int D2Status = 0;
 int D3Status = 0;
 int D4Status = 0;
@@ -40,7 +42,9 @@ DHT dht(DHTPIN, DHTTYPE);
 
 //Define FirebaseESP8266 data object
 FirebaseData firebaseData;
-FirebaseData ledData;
+FirebaseData ledData1;
+FirebaseData ledData2;
+
 
 FirebaseJson json;
 void handleNewMessages(int numNewMessages) {
@@ -54,27 +58,17 @@ void handleNewMessages(int numNewMessages) {
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
 
-    if (text == "/Green_bulb_ON") {
-      digitalWrite(led1, HIGH);   // turn the LED on (HIGH is the voltage level)
-       D1Status = 1;
-       bot.sendMessage(chat_id, "Hello the Green bulb is ON", "");
-    }
-
-    if (text == "/Green_bulb_OFF") {
-       D1Status = 0;
-      digitalWrite(led1, LOW);    // turn the LED off (LOW is the voltage level)
-      bot.sendMessage(chat_id, "OK the Green bulb turned OFF", "");
-    }
+   
     if (text == "/White_bulb_ON") {
       digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
        D2Status = 1;
-       bot.sendMessage(chat_id, "Hello the Green bulb is ON", "");
+       bot.sendMessage(chat_id, "Hello the white bulb is ON", "");
     }
 
     if (text == "/White_bulb_OFF") {
        D2Status = 0;
       digitalWrite(led, LOW);    // turn the LED off (LOW is the voltage level)
-      bot.sendMessage(chat_id, "OK the Green bulb turned OFF", "");
+      bot.sendMessage(chat_id, "OK the white bulb turned OFF", "");
     }
      if (text == "/RGB_ON") {
       digitalWrite(rgb,HIGH);
@@ -106,8 +100,6 @@ void handleNewMessages(int numNewMessages) {
     if (text == "/start") {
       String welcome = "Welcome To Smart Home Automation Bot.Lets control your appliances from here, " + from_name + ".\n";
       welcome += "Lets tap on this commands to change the statuses of your home.\n\n";
-      welcome += "/Green_bulb_ON : to Turn on the GreenBulb \n";
-      welcome += "/Green_bulb_OFF : to Turn off the GreenBulb \n";
       welcome += "/White_bulb_ON : to Turn ON The White Bulb\n";
       welcome += "/White_bulb_OFF : to Turn OFF The White Bulb\n";
       welcome += "/RGB_ON : to Turn ON  RGB \n";
@@ -132,6 +124,9 @@ void setup()
   pinMode(led,OUTPUT);
   pinMode(led1,OUTPUT);
   pinMode(led2,OUTPUT);
+  pinMode(buzzer,OUTPUT);
+  pinMode(AC,OUTPUT);
+
 
   client.setInsecure();
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -143,7 +138,10 @@ void setup()
   }
   Serial.println();
   Serial.print("Connected with IP: ");
-  
+  digitalWrite(buzzer, HIGH);
+     delay(1000);
+  digitalWrite(buzzer, LOW);
+     delay(1000);
  
   Serial.println(WiFi.localIP());
   Serial.println();
@@ -222,27 +220,37 @@ void loop() {
     Serial.println("FAN turned OFF");
     
   } 
-  
-  if (Firebase.getString(ledData, "/BEDROOM")){
-    Serial.println(ledData.stringData());
-    if (ledData.stringData() == "true") {
-    digitalWrite(led1, HIGH);
-    }
-  else if (ledData.stringData() == "false"){
+     if (temp < 24)
+  {
+    digitalWrite(AC, HIGH);
+    Serial.println("AC turned ON");
+}
+  else {
+    digitalWrite(AC, LOW);
+    Serial.println("AC turned OFF");
+    
+  } 
+  if (Firebase.getString(ledData1, "/Humidity/bed")){
+    Serial.println(ledData1.stringData());
+    if (ledData1.stringData() == "1") {
     digitalWrite(led1, LOW);
     }
-  }
-  if (Firebase.getString(ledData, "/DINNINGROOM")){
-    Serial.println(ledData.stringData());
-    if (ledData.stringData() == "true") {
-    digitalWrite(led, HIGH);
+  else if (ledData1.stringData() == "0"){
+    digitalWrite(led1, HIGH);
     }
-  else if (ledData.stringData() == "false"){
+    }
+  if (Firebase.getString(ledData2, "/Humidity/table")){
+    Serial.println(ledData2.stringData());
+    if (ledData2.stringData() == "1") {
     digitalWrite(led, LOW);
     }
-  }
-  delay(1000);
-   if (millis() > lastTimeBotRan + botRequestDelay)  {
+  else if (ledData2.stringData() == "0"){
+    digitalWrite(led, HIGH);
+    }
+     }
+    delay(1000);
+ 
+ if (millis() > lastTimeBotRan + botRequestDelay)  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
     while(numNewMessages) {
@@ -253,5 +261,6 @@ void loop() {
 
     lastTimeBotRan = millis();
   }
+   
 }
 //smartHomeAutomationwithMachineLearning 
