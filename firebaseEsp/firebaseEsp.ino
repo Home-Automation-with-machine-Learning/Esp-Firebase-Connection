@@ -230,7 +230,7 @@ void loop() {
     Serial.println("AC turned OFF");
     
   } 
-  if (Firebase.getString(ledData1, "/Humidity/bed")){
+  if (Firebase.getString(ledData1, "/BEDROOM/BEDROOM")){
     Serial.println(ledData1.stringData());
     if (ledData1.stringData() == "1") {
     digitalWrite(led1, LOW);
@@ -239,7 +239,7 @@ void loop() {
     digitalWrite(led1, HIGH);
     }
     }
-  if (Firebase.getString(ledData2, "/Humidity/table")){
+  if (Firebase.getString(ledData2, "/DINNINGROOM/DINNINGROOM")){
     Serial.println(ledData2.stringData());
     if (ledData2.stringData() == "1") {
     digitalWrite(led, LOW);
